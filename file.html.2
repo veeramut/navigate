@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Navigate the News Landscape</title>
+  <style>
+    :root {
+      --bg: #0b0c10;
+      --surface: #111218;
+      --card: #161821;
+      --text: #e6e7eb;
+      --muted: #a9adba;
+      --brand: #7c5cff;
+      --brand-2: #37c3ff;
+      --ok: #2ecc71;
+      --warn: #f39c12;
+      --danger: #e74c3c;
+      --ring: rgba(124, 92, 255, .5);
+      --chip: #1e2030;
+      --chip-active: #272a3a;
+      --border: #242639;
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+    }
+
+    @media (prefers-color-scheme: light) {
+      :root {
+        --bg: #f7f7fb;
+        --surface: #ffffff;
+        --card: #ffffff;
+        --text: #1e2130;
+        --muted: #5b6072;
+        --brand: #5b4bff;
+        --brand-2: #0aa0df;
+        --chip: #eef0f6;
+        --chip-active: #e4e7f1;
+        --border: #e7eaf3;
+        --shadow: 0 10px 30px rgba(21, 31, 53, .08);
+      }
+    }
+
+    * { box-sizing: border-box }
+    html, body { height: 100% }
+
+    body {
+      margin: 0;
+      font: 15px/1.55 system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      background: linear-gradient(180deg, var(--bg), #0a0b12 30%, var(--bg));
+      color: var(--text);
+    }
+
+    /* Layout */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    header.appbar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: linear-gradient(180deg, var(--surface), color-mix(in srgb, var(--surface), transparent 15%));
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(8px);
+    }
+
+    .appbar-inner {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      gap: 12px;
+      align-items: center;
+      padding: 14px 24px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .brand {
+      display: flex; align-items: center; gap: 12px;
+      font-weight: 800; letter-spacing: .2px;
+    }
+    .logo {
+      width: 28px; height: 28px; border-radius: 8px;
+      background: conic-gradient(from 210deg, var(--brand), var(--brand-2), var(--brand));
+      box-shadow: 0 6px 14px color-mix(in srgb, var(--brand), transparent 70%);
+    }
+
+    .searchbar {
+      display: flex; align-items: center; gap: 8px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px; padding: 8px 12px; box-shadow: var(--shadow);
+    }
+    .searchbar input {
+      flex: 1; border: none; outline: none; background: transparent; color: var(--text);
+      font-size: 15px;
+    }
+
+    .controls { display: flex; gap: 10px; align-items: center; }
+    .btn, .chip {
+      cursor: pointer; user-select: none;
+      border: 1px solid var(--border);
+      border-radius: 12px; padding: 8px 12px; background: var(--chip);
+      color: var(--text); display: inline-flex; align-items: center; gap: 8px;
+      transition: .2s transform, .2s background-color, .2s border-color, .2s box-shadow;
+    }
+    .btn:hover, .chip:hover { transform: translateY(-1px); }
+    .btn:focus-visible, .chip:focus-visible { outline: none; box-shadow: 0 0 0 3px var(--ring); }
+    .btn.primary { background: linear-gradient(180deg, var(--brand), color-mix(in srgb, var(--brand), black 10%)); border-color: transparent; }
+
+    .pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 4px 8px; border-radius: 999px; font-size: 12px; color: var(--muted);
+      background: color-mix(in srgb, var(--chip), transparent 25%);
+      border: 1px dashed var(--border);
+    }
+
+    /* Chips row */
+    .chips {
+      display: flex; gap: 8px; flex-wrap: wrap; margin: 14px 0 6px;
+    }
+    .chip[aria-pressed="true"] { background: var(--chip-active); border-color: color-mix(in srgb, var(--border), var(--brand) 35%); }
+
+    /* Main */
+    main { display: grid; grid-template-columns: 1fr 320px; gap: 18px; }
+    @media (max-width: 980px) { main { grid-template-columns: 1fr; } }
+
+    .panel {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 14px; box-shadow: var(--shadow);
+    }
+
+    .toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; padding: 8px 4px 10px; }
+    .toolbar .left, .toolbar .right { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+
+    select, .select {
+      appearance: none; padding: 8px 12px; border-radius: 12px; border: 1px solid var(--border); background: var(--card);
+      color: var(--text);
+    }
+
+    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    @media (max-width: 1100px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 720px) { .grid { grid-template-columns: 1fr; } }
+
+    article.card {
+      display: grid; grid-template-rows: 160px auto; border: 1px solid var(--border); background: var(--card); border-radius: 16px; overflow: clip; position: relative;
+      transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease; isolation: isolate;
+    }
+    article.card:hover { transform: translateY(-2px); border-color: color-mix(in srgb, var(--border), var(--brand) 25%); box-shadow: 0 18px 36px rgba(0,0,0,.28); }
+
+    .thumb { position: relative; overflow: hidden; }
+    .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; filter: saturate(1.05) contrast(1.05); }
+
+    .badge { position: absolute; left: 10px; top: 10px; padding: 6px 10px; font-size: 12px; border-radius: 999px; background: var(--surface); border: 1px solid var(--border); color: var(--muted); }
+
+    .content { padding: 14px; display: grid; gap: 8px; }
+    .title { font-weight: 700; font-size: 16px; line-height: 1.3; }
+    .meta { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 12px; }
+    .meta .dot { width: 4px; height: 4px; background: var(--muted); opacity: .6; border-radius: 50%; display: inline-block; }
+
+    .tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+    .tag { font-size: 11px; padding: 4px 8px; border-radius: 999px; background: var(--chip); border: 1px solid var(--border); color: var(--muted); }
+
+    .actions { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; }
+    .actions .left, .actions .right { display: flex; align-items: center; gap: 8px; }
+
+    .icon-btn {
+      border: 1px solid var(--border); background: var(--chip); border-radius: 10px; padding: 6px 8px; cursor: pointer;
+    }
+    .icon-btn[aria-pressed="true"] { outline: none; box-shadow: 0 0 0 3px var(--ring); }
+
+    aside .panel + .panel { margin-top: 14px; }
+
+    .list { display: grid; gap: 10px; }
+    .list .row { display: grid; grid-template-columns: 48px 1fr auto; gap: 10px; align-items: center; padding: 8px; border-radius: 12px; border: 1px solid var(--border); background: var(--card); }
+    .list .row img { width: 48px; height: 48px; object-fit: cover; border-radius: 10px; }
+    .list .row .title { font-size: 14px; }
+
+    .subtle { color: var(--muted); }
+
+    /* Modals & overlays */
+    dialog {
+      border: 1px solid var(--border); border-radius: 16px; background: var(--surface); color: var(--text); max-width: 640px; width: min(92vw, 640px);
+      box-shadow: var(--shadow);
+    }
+    dialog::backdrop { background: rgba(0,0,0,.5); }
+
+    .kbd { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; font-size: 12px; padding: 2px 6px; border-radius: 6px; border: 1px solid var(--border); background: var(--card); color: var(--muted); }
+
+    .footer { margin: 20px 0 60px; color: var(--muted); text-align: center; font-size: 13px; }
+
+    .visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+  </style>
+</head>
+<body>
+  <header class="appbar" role="banner">
+    <div class="appbar-inner">
+      <div class="brand" aria-label="App brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <div style="font-size:14px; color:var(--muted); letter-spacing:.08em; text-transform:uppercase">Prototype</div>
+          <div style="font-size:18px">Navigate the News Landscape</div>
+        </div>
+      </div>
+      <label class="searchbar" role="search" aria-label="Search articles">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M21 21l-4.2-4.2M18 10.5a7.5 7.5 0 11-15 0 7.5 7.5 0 0115 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <input id="q" placeholder="Search headlines, topics, sources…  (Press /)" autocomplete="off" />
+        <span class="pill" aria-hidden="true"><span class="kbd">/</span> focus</span>
+      </label>
+      <div class="controls">
+        <button id="toggleTheme" class="btn" aria-pressed="false" title="Toggle theme (D)">?? Theme</button>
+        <button id="openShortcuts" class="btn" title="Keyboard shortcuts (?)">?? Shortcuts</button>
+        <a class="btn primary" href="#" id="fakeSync">? Sync</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+    <section class="panel" aria-label="Category filters">
+      <div class="chips" id="chipRow">
+        <!-- Chips injected by JS -->
+      </div>
+      <div class="toolbar" role="region" aria-label="Filters and sorting">
+        <div class="left">
+          <label class="select" title="Sort order">
+            <select id="sortBy" aria-label="Sort by">
+              <option value="latest">Latest</option>
+              <option value="relevance">Relevance</option>
+              <option value="most-read">Most Read</option>
+            </select>
+          </label>
+          <label class="select" title="Date range">
+            <select id="dateRange" aria-label="Date range">
+              <option value="any">Any time</option>
+              <option value="24h">Last 24 hours</option>
+              <option value="7d">Last 7 days</option>
+              <option value="30d">Last 30 days</option>
+            </select>
+          </label>
+          <label class="select" title="Source filter">
+            <select id="sourceFilter" aria-label="Source filter">
+              <option value="all">All sources</option>
+            </select>
+          </label>
+        </div>
+        <div class="right">
+          <span class="pill" id="resultsCount" aria-live="polite">0 results</span>
+          <button class="btn" id="clearFilters">Clear</button>
+        </div>
+      </div>
+    </section>
+
+    <main>
+      <section class="panel" aria-label="Articles">
+        <div class="grid" id="grid"></div>
+      </section>
+
+      <aside aria-label="Sidebar">
+        <section class="panel" aria-label="Reading list">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px">
+            <h3 style="margin:0">Reading List</h3>
+            <button class="btn" id="clearSaved">Clear</button>
+          </div>
+          <div class="list" id="savedList" aria-live="polite"></div>
+        </section>
+
+        <section class="panel" aria-label="Trends">
+          <h3 style="margin:0 0 8px 0">Trending Topics</h3>
+          <div class="chips" id="trending"></div>
+        </section>
+      </aside>
+    </main>
+
+    <p class="footer">Demo data only. Build on this scaffold to plug in a real news API. • Keyboard: <span class="kbd">/</span> focus search, <span class="kbd">D</span> theme, <span class="kbd">S</span> save, <span class="kbd">?</span> help.</p>
+  </div>
+
+  <dialog id="shortcuts">
+    <form method="dialog" style="margin:0">
+      <header class="panel" style="border:none; box-shadow:none; background:transparent; padding:10px 10px 0 10px">
+        <h3 style="margin:0 0 8px">Keyboard Shortcuts</h3>
+        <p class="subtle" style="margin:0 0 6px">Speed through the news like a pro.</p>
+      </header>
+      <div class="panel" style="border:none; box-shadow:none; background:transparent">
+        <ul>
+          <li><span class="kbd">/</span> Focus search</li>
+          <li><span class="kbd">D</span> Toggle theme</li>
+          <li><span class="kbd">S</span> Save selected article</li>
+          <li><span class="kbd">?/?</span> Change category</li>
+          <li><span class="kbd">Esc</span> Close dialogs</li>
+        </ul>
+      </div>
+      <div style="padding:10px; display:flex; justify-content:flex-end">
+        <button class="btn">Close</button>
+      </div>
+    </form>
+  </dialog>
+
+  <template id="rowTpl">
+    <div class="row">
+      <img alt="thumbnail"/>
+      <div>
+        <div class="title"></div>
+        <div class="subtle meta"></div>
+      </div>
+      <button class="icon-btn" title="Remove">?</button>
+    </div>
+  </template>
+
+  <script>
+    // --- Demo data -----------------------------------------------------------
+    const CATEGORIES = ["Top", "World", "India", "Business", "Tech", "Science", "Sports", "Entertainment"];
+
+    const DEMO = [
+      { id: 1, title: "Semiconductor policy lifts fab pipeline in India", source: "The Hindu", category: "Business", tags: ["semiconductors", "policy"], date: daysAgo(0.5), reads: 31200, img: "https://images.unsplash.com/photo-1555617981-dac3880ba7f9?auto=format&fit=crop&w=600&q=60", summary: "Investments accelerate as states announce incentives; experts warn of talent crunch.", url: "#" },
+      { id: 2, title: "Monsoon patterns shift across subcontinent", source: "Indian Express", category: "Science", tags: ["weather", "climate"], date: daysAgo(2), reads: 28100, img: "https://images.unsplash.com/photo-1503437313881-503a91226402?auto=format&fit=crop&w=600&q=60", summary: "IMD notes prolonged breaks affecting sowing windows for farmers.", url: "#" },
+      { id: 3, title: "Startup raises $120M to build AI chips", source: "TechCrunch", category: "Tech", tags: ["ai", "chips"], date: daysAgo(1), reads: 82100, img: "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=60", summary: "New architecture promises speedups while lowering power consumption.", url: "#" },
+      { id: 4, title: "India vs Australia: series decider tonight", source: "ESPNcricinfo", category: "Sports", tags: ["cricket"], date: daysAgo(0.2), reads: 154300, img: "https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?auto=format&fit=crop&w=600&q=60", summary: "Teams prepare for a high-stakes match with playoff implications.", url: "#" },
+      { id: 5, title: "Global markets steady ahead of Fed meet", source: "Reuters", category: "Business", tags: ["markets", "federal reserve"], date: daysAgo(3), reads: 120300, img: "https://images.unsplash.com/photo-1430165558479-de3cf8cf1478?auto=format&fit=crop&w=600&q=60", summary: "Investors weigh inflation data and guidance from central bankers.", url: "#" },
+      { id: 6, title: "Chandrayaan follow-on mission outlined by ISRO", source: "Hindustan Times", category: "Science", tags: ["space", "isro"], date: daysAgo(5), reads: 91000, img: "https://images.unsplash.com/photo-1547234935-80c7145ec969?auto=format&fit=crop&w=600&q=60", summary: "Roadmap emphasises autonomous navigation and long-duration operations.", url: "#" },
+      { id: 7, title: "New data law: what changes for users", source: "Mint", category: "World", tags: ["privacy", "regulation"], date: daysAgo(6), reads: 45100, img: "https://images.unsplash.com/photo-1551281044-8d8e32c65d9d?auto=format&fit=crop&w=600&q=60", summary: "A quick guide to consent, portability and redress.", url: "#" },
+      { id: 8, title: "Hyderabad startups lead EV charging rollout", source: "Business Standard", category: "India", tags: ["ev", "charging"], date: daysAgo(0.8), reads: 38100, img: "https://images.unsplash.com/photo-1617727553252-65863b1fda2b?auto=format&fit=crop&w=600&q=60", summary: "Public-private partnerships boost urban coverage.", url: "#" },
+      { id: 9, title: "Open-source LLMs push into production", source: "VentureBeat", category: "Tech", tags: ["open-source", "llm"], date: daysAgo(8), reads: 70200, img: "https://images.unsplash.com/photo-1555255707-c07966088b7b?auto=format&fit=crop&w=600&q=60", summary: "Firms tout cost control and transparency advantages.", url: "#" },
+      { id: 10, title: "Box office surprises as indie film tops charts", source: "Variety", category: "Entertainment", tags: ["film", "box office"], date: daysAgo(1.5), reads: 65400, img: "https://images.unsplash.com/photo-1517602302552-471fe67acf66?auto=format&fit=crop&w=600&q=60", summary: "Strong word-of-mouth propels weekend receipts.", url: "#" },
+    ];
+
+    const SOURCES = [...new Set(DEMO.map(d => d.source))];
+
+    // --- State ---------------------------------------------------------------
+    const state = {
+      q: "",
+      category: "Top",
+      sortBy: "latest",
+      dateRange: "any",
+      source: "all",
+      saved: JSON.parse(localStorage.getItem("savedNews") || "[]"),
+      theme: localStorage.getItem("theme") || (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark')
+    };
+
+    // --- Elements ------------------------------------------------------------
+    const el = (sel) => document.querySelector(sel);
+
+    const grid = el('#grid');
+    const chipRow = el('#chipRow');
+    const q = el('#q');
+    const sortBy = el('#sortBy');
+    const dateRange = el('#dateRange');
+    const sourceFilter = el('#sourceFilter');
+    const resultsCount = el('#resultsCount');
+    const savedList = el('#savedList');
+
+    // --- Init ---------------------------------------------------------------
+    document.addEventListener('DOMContentLoaded', () => {
+      // theme
+      document.documentElement.dataset.theme = state.theme;
+      if (state.theme === 'light') document.documentElement.classList.add('light');
+
+      // categories chips
+      CATEGORIES.forEach((c, i) => {
+        const b = document.createElement('button');
+        b.className = 'chip'; b.textContent = c; b.dataset.cat = c;
+        b.setAttribute('aria-pressed', c === state.category ? 'true' : 'false');
+        b.addEventListener('click', () => setCategory(c));
+        chipRow.appendChild(b);
+      });
+
+      // source filter options
+      SOURCES.forEach(s => {
+        const opt = document.createElement('option'); opt.value = s; opt.textContent = s; sourceFilter.appendChild(opt);
+      });
+
+      // listeners
+      q.addEventListener('input', () => { state.q = q.value.trim(); render(); });
+      sortBy.addEventListener('change', () => { state.sortBy = sortBy.value; render(); });
+      dateRange.addEventListener('change', () => { state.dateRange = dateRange.value; render(); });
+      sourceFilter.addEventListener('change', () => { state.source = sourceFilter.value; render(); });
+      el('#clearFilters').addEventListener('click', clearFilters);
+      el('#toggleTheme').addEventListener('click', toggleTheme);
+      el('#openShortcuts').addEventListener('click', () => el('#shortcuts').showModal());
+      el('#fakeSync').addEventListener('click', (e) => { e.preventDefault(); pulse(resultsCount); });
+      el('#clearSaved').addEventListener('click', () => { state.saved = []; persistSaved(); renderSaved(); });
+
+      // trending topics
+      renderTrending();
+
+      // first render
+      render();
+      renderSaved();
+
+      // keyboard shortcuts
+      window.addEventListener('keydown', onKey);
+    });
+
+    function onKey(e) {
+      if (e.key === '/') { e.preventDefault(); q.focus(); return; }
+      if (e.key.toLowerCase() === 'd') { toggleTheme(); return; }
+      if (e.key === '?') { el('#shortcuts').open ? el('#shortcuts').close() : el('#shortcuts').showModal(); return; }
+    }
+
+    function toggleTheme() {
+      const now = state.theme === 'dark' ? 'light' : 'dark';
+      state.theme = now;
+      localStorage.setItem('theme', now);
+      document.documentElement.classList.toggle('light');
+      pulse(el('#toggleTheme'));
+    }
+
+    function clearFilters() {
+      state.q = ''; q.value = '';
+      state.category = 'Top';
+      state.sortBy = 'latest'; sortBy.value = 'latest';
+      state.dateRange = 'any'; dateRange.value = 'any';
+      state.source = 'all'; sourceFilter.value = 'all';
+      [...chipRow.children].forEach(b => b.setAttribute('aria-pressed', b.dataset.cat === 'Top'));
+      render();
+    }
+
+    function setCategory(c) {
+      state.category = c;
+      ;[...chipRow.children].forEach(b => b.setAttribute('aria-pressed', String(b.dataset.cat === c)));
+      render();
+    }
+
+    function withinRange(date, range) {
+      const now = new Date();
+      const d = new Date(date);
+      const diff = (now - d) / 86400000; // days
+      if (range === 'any') return true;
+      if (range === '24h') return diff <= 1;
+      if (range === '7d') return diff <= 7;
+      if (range === '30d') return diff <= 30;
+      return true;
+    }
+
+    function results() {
+      let rows = DEMO.slice();
+      if (state.category !== 'Top') rows = rows.filter(r => r.category === state.category);
+      if (state.source !== 'all') rows = rows.filter(r => r.source === state.source);
+      if (state.q) {
+        const t = state.q.toLowerCase();
+        rows = rows.filter(r => r.title.toLowerCase().includes(t) || r.summary.toLowerCase().includes(t) || r.tags.some(x => x.includes(t)));
+      }
+      rows = rows.filter(r => withinRange(r.date, state.dateRange));
+      if (state.sortBy === 'latest') rows.sort((a,b) => +new Date(b.date) - +new Date(a.date));
+      if (state.sortBy === 'most-read') rows.sort((a,b) => b.reads - a.reads);
+      if (state.sortBy === 'relevance' && state.q) {
+        // naïve relevance: title match > summary match > tag match
+        const score = (r) => (r.title.toLowerCase().includes(state.q.toLowerCase())?3:0) + (r.summary.toLowerCase().includes(state.q.toLowerCase())?2:0) + (r.tags.some(t => t.includes(state.q.toLowerCase()))?1:0);
+        rows.sort((a,b) => score(b) - score(a));
+      }
+      return rows;
+    }
+
+    function render() {
+      const rows = results();
+      resultsCount.textContent = `${rows.length} result${rows.length!==1?'s':''}`;
+      grid.replaceChildren();
+      rows.forEach(r => grid.appendChild(renderCard(r)));
+    }
+
+    function renderCard(r) {
+      const elc = document.createElement('article'); elc.className = 'card'; elc.tabIndex = 0; elc.setAttribute('aria-label', r.title);
+      const since = timeAgo(new Date(r.date));
+      elc.innerHTML = `
+        <div class="thumb">
+          <img loading="lazy" alt="${escapeHtml(r.title)} thumbnail" src="${r.img}"/>
+          <div class="badge">${r.source}</div>
+        </div>
+        <div class="content">
+          <div class="title">${escapeHtml(r.title)}</div>
+          <div class="meta"><span>${r.category}</span><span class="dot"></span><span>${since}</span><span class="dot"></span><span>${formatReads(r.reads)} reads</span></div>
+          <div class="subtle">${escapeHtml(r.summary)}</div>
+          <div class="tags">${r.tags.map(t => `<span class="tag">#${escapeHtml(t)}</span>`).join('')}</div>
+          <div class="actions">
+            <div class="left">
+              <a class="btn" href="${r.url}" target="_blank" rel="noopener" title="Open link">Open</a>
+              <button class="btn" data-copy>Copy link</button>
+            </div>
+            <div class="right">
+              <button class="icon-btn" data-save title="Save (S)">?</button>
+              <button class="icon-btn" data-share title="Share">??</button>
+            </div>
+          </div>
+        </div>`;
+
+      elc.querySelector('[data-copy]').addEventListener('click', async () => {
+        await navigator.clipboard.writeText(r.url);
+        toast('Link copied');
+      });
+
+      elc.querySelector('[data-save]').addEventListener('click', () => toggleSave(r));
+      elc.querySelector('[data-share]').addEventListener('click', async () => {
+        if (navigator.share) {
+          await navigator.share({ title: r.title, text: r.summary, url: r.url });
+        } else {
+          await navigator.clipboard.writeText(`${r.title} — ${r.url}`);
+          toast('Share text copied');
+        }
+      });
+      return elc;
+    }
+
+    function toggleSave(item) {
+      const exists = state.saved.find(s => s.id === item.id);
+      if (exists) state.saved = state.saved.filter(s => s.id !== item.id);
+      else state.saved = [item, ...state.saved];
+      persistSaved();
+      renderSaved();
+      toast(exists ? 'Removed from list' : 'Saved to list');
+    }
+
+    function persistSaved() { localStorage.setItem('savedNews', JSON.stringify(state.saved)); }
+
+    function renderSaved() {
+      savedList.replaceChildren();
+      if (!state.saved.length) { savedList.innerHTML = '<div class="subtle">No saved articles yet.</div>'; return; }
+      const tpl = el('#rowTpl');
+      state.saved.forEach(item => {
+        const row = tpl.content.firstElementChild.cloneNode(true);
+        row.querySelector('img').src = item.img;
+        row.querySelector('.title').textContent = item.title;
+        row.querySelector('.meta').textContent = `${item.source} • ${timeAgo(new Date(item.date))}`;
+        row.querySelector('button').addEventListener('click', () => { toggleSave(item); });
+        savedList.appendChild(row);
+      });
+    }
+
+    function renderTrending() {
+      const t = countTags(DEMO).slice(0, 10);
+      const box = el('#trending'); box.replaceChildren();
+      t.forEach(([tag, count]) => {
+        const b = document.createElement('button');
+        b.className = 'chip'; b.textContent = `#${tag}`; b.title = `${count} mentions`;
+        b.addEventListener('click', () => { q.value = tag; state.q = tag; render(); });
+        box.appendChild(b);
+      });
+    }
+
+    // --- Utils --------------------------------------------------------------
+    function daysAgo(d) { const now = new Date(); now.setDate(now.getDate() - d); return now.toISOString(); }
+
+    function timeAgo(d) {
+      const s = Math.floor((new Date() - d) / 1000);
+      const t = [
+        [31536000, 'y'], [2592000, 'mo'], [604800, 'w'], [86400, 'd'], [3600, 'h'], [60, 'm']
+      ];
+      for (const [sec, label] of t) { const v = Math.floor(s / sec); if (v >= 1) return v + label + ' ago'; }
+      return 'just now';
+    }
+
+    function formatReads(n) { return Intl.NumberFormat().format(n); }
+
+    function countTags(rows) {
+      const map = new Map();
+      rows.flatMap(r => r.tags).forEach(t => map.set(t, (map.get(t) || 0) + 1));
+       return [...map.entries()].sort((a,b) => b[1] - a[1]);
+    }
+
+    function pulse(node) {
+      node.animate([
+        { transform: 'scale(1)', boxShadow: 'none' },
+        { transform: 'scale(1.03)', boxShadow: '0 0 0 6px var(--ring)' },
+        { transform: 'scale(1)', boxShadow: 'none' },
+      ], { duration: 400 });
+    }
+
+    function toast(msg) {
+      const tip = document.createElement('div');
+      tip.textContent = msg;
+      Object.assign(tip.style, {
+        position: 'fixed', bottom: '18px', left: '50%', transform: 'translateX(-50%)', padding: '10px 14px',
+        background: 'var(--surface)', color: 'var(--text)', border: '1px solid var(--border)', borderRadius: '12px',
+        boxShadow: 'var(--shadow)', zIndex: 99
+      });
+      document.body.appendChild(tip);
+      setTimeout(() => tip.remove(), 1200);
+    }
+
+    function escapeHtml(str) {
+      return str.replace(/[&<>'"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','\'':'&#39;','"':'&quot;'}[ch]));
+    }
+  </script>
+</body>
+</html>
