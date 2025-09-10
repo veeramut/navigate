@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Insight Stream — Navigate the News Landscape</title>
+  <style>
+    :root{
+      --bg:#f6f7fb; --card:#ffffff; --muted:#6b7280; --accent:#0f62fe; --glass: rgba(255,255,255,0.6);
+      --max-width:1200px;
+    }
+    *{box-sizing:border-box}
+    body{font-family:Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; background:var(--bg); color:#0f172a; margin:0; padding:28px; display:flex; justify-content:center}
+    .app{width:100%; max-width:var(--max-width)}
+    header{display:flex; align-items:center; gap:18px; margin-bottom:20px}
+    .logo{display:flex; align-items:center; gap:12px}
+    .logo .mark{width:46px; height:46px; border-radius:10px; background:linear-gradient(135deg,#0f62fe,#6f46ff); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700}
+    h1{font-size:20px; margin:0}
+    p.lead{margin:0; color:var(--muted); font-size:13px}
+
+    .controls{display:flex; gap:12px; margin:18px 0 26px}
+    .search{flex:1; display:flex; align-items:center; gap:10px; background:var(--card); border-radius:12px; padding:10px 14px; box-shadow:0 1px 3px rgba(16,24,40,0.04)}
+    .search input{border:0; outline:0; font-size:14px; width:100%}
+    .filters{display:flex; gap:8px; align-items:center}
+    .btn{background:var(--card); border-radius:10px; padding:8px 12px; font-size:13px; cursor:pointer; box-shadow:0 1px 2px rgba(16,24,40,0.04)}
+
+    .layout{display:grid; grid-template-columns: 1fr 320px; gap:20px}
+    .feed{display:grid; gap:14px}
+
+    .topics{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:6px}
+    .chip{background:var(--card); padding:8px 12px; border-radius:999px; font-size:13px; cursor:pointer}
+
+    .card{background:var(--card); border-radius:12px; padding:16px; display:flex; gap:14px; align-items:flex-start; box-shadow:0 6px 18px rgba(15,23,42,0.04)}
+    .card img{width:140px; height:96px; object-fit:cover; border-radius:8px}
+    .meta{font-size:12px; color:var(--muted); margin-bottom:6px}
+    .title{font-size:16px; margin:0 0 8px}
+    .excerpt{margin:0; color:#334155; font-size:14px}
+
+    .sidebar{position:relative}
+    .widget{background:linear-gradient(180deg,var(--glass),rgba(255,255,255,0.98)); padding:14px; border-radius:12px; backdrop-filter: blur(6px); box-shadow:0 6px 24px rgba(15,23,42,0.06)}
+    .widget h3{margin:0 0 10px}
+    .trend{display:flex; gap:10px; align-items:center; padding:8px 6px}
+    .trend .dot{width:8px; height:8px; border-radius:50%}
+    .small{font-size:13px; color:var(--muted)}
+
+    footer{margin-top:22px; color:var(--muted); font-size:13px}
+
+    /* Responsive */
+    @media (max-width:880px){
+      .layout{grid-template-columns: 1fr}
+      .sidebar{order:2}
+    }
+
+  </style>
+</head>
+<body>
+  <div class="app" role="application" aria-label="Insight Stream — news navigator">
+    <header>
+      <div class="logo" aria-hidden>
+        <div class="mark">IS</div>
+      </div>
+      <div>
+        <h1>Insight Stream</h1>
+        <p class="lead">Navigate today's news: filter, prioritise, and explore multiple perspectives.</p>
+      </div>
+    </header>
+
+    <section class="controls" aria-label="search and filters">
+      <div class="search" role="search">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden><path d="M21 21l-4.35-4.35" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <input type="search" placeholder="Search topics, outlets, headlines (e.g. climate policy)" aria-label="Search news" />
+      </div>
+
+      <div class="filters" role="toolbar" aria-label="filters">
+        <button class="btn" aria-pressed="false">Sort: Relevance</button>
+        <button class="btn" aria-pressed="false">Date Range</button>
+        <button class="btn" aria-pressed="false">Source: All</button>
+      </div>
+    </section>
+
+    <main class="layout">
+      <div>
+        <div class="topics" aria-label="topic filters">
+          <button class="chip" aria-pressed="false">Politics</button>
+          <button class="chip" aria-pressed="false">Economy</button>
+          <button class="chip" aria-pressed="false">Science</button>
+          <button class="chip" aria-pressed="false">Tech</button>
+          <button class="chip" aria-pressed="false">Health</button>
+          <button class="chip" aria-pressed="false">Culture</button>
+          <button class="chip" aria-pressed="false">Environment</button>
+        </div>
+
+        <section class="feed" aria-live="polite">
+          <!-- Article card 1 -->
+          <article class="card" role="article">
+            <img src="https://via.placeholder.com/280x192" alt="" />
+            <div>
+              <div class="meta">The Global Times • Sep 8, 2025 • Analysis</div>
+              <h2 class="title">Rethinking Global Supply Chains: What comes next?</h2>
+              <p class="excerpt">A new wave of policy proposals aims to diversify production and reduce vulnerability. Analysts weigh the trade-offs for consumers and industry leaders.</p>
+            </div>
+          </article>
+
+          <!-- Article card 2 -->
+          <article class="card">
+            <img src="https://via.placeholder.com/280x192" alt="" />
+            <div>
+              <div class="meta">HealthBeat • Sep 7, 2025 • Reporting</div>
+              <h2 class="title">Breakthrough in rapid diagnostics could change rural care</h2>
+              <p class="excerpt">Field trials show promising accuracy for a handheld test that detects multiple infections in under 20 minutes.</p>
+            </div>
+          </article>
+
+          <!-- Article card 3 (opinion) -->
+          <article class="card">
+            <img src="https://via.placeholder.com/280x192" alt="" />
+            <div>
+              <div class="meta">Opinion • Sep 6, 2025</div>
+              <h2 class="title">Why civic media literacy must be taught in schools</h2>
+              <p class="excerpt">Teaching students how to evaluate news, spot disinformation, and understand bias protects democratic discourse.</p>
+            </div>
+          </article>
+
+          <!-- Quick 'explainer' strip -->
+          <div class="card" style="align-items:center; gap:12px">
+            <div style="flex:1">
+              <div class="meta">Explainer • 3 min read</div>
+              <h2 class="title">How to read a policy story: 5 quick steps</h2>
+              <p class="excerpt">Look for data sources, named experts, counterarguments, implementation timelines, and named stakeholders.</p>
+            </div>
+            <button class="btn" aria-label="Read explainer">Read</button>
+          </div>
+
+        </section>
+
+        <footer>
+          Tip: Use "Source" filter to compare how outlets cover the same event. Click a headline to expand full coverage and related timelines.
+        </footer>
+      </div>
+
+      <aside class="sidebar">
+        <div class="widget" role="complementary" aria-label="sidebar widgets">
+          <h3>Trending topics</h3>
+          <div class="trend"><div class="dot" style="background:#ef4444"></div><div><strong>Climate Summit</strong><div class="small">15k mentions • Policy talks</div></div></div>
+          <div class="trend"><div class="dot" style="background:#f59e0b"></div><div><strong>AI Regulation</strong><div class="small">10k mentions • Global debate</div></div></div>
+          <div class="trend"><div class="dot" style="background:#10b981"></div><div><strong>Supply Chain</strong><div class="small">7k mentions • New proposals</div></div></div>
+
+          <hr style="border:none; height:1px; background:#eef2ff; margin:12px 0;">
+
+          <h3>From diverse outlets</h3>
+          <p class="small">Click to compare multiple perspectives quickly: summaries, bias signals, and timeline.</p>
+          <ul style="padding-left:18px; margin:8px 0; color:var(--muted)">
+            <li>Global Times — in-depth analysis</li>
+            <li>HealthBeat — field reporting</li>
+            <li>Civic Ledger — opinion & explainers</li>
+          </ul>
+
+          <div style="margin-top:10px; display:flex; gap:8px;">
+            <button class="btn">Compare</button>
+            <button class="btn">Subscribe</button>
+          </div>
+        </div>
+
+        <div style="height:16px"></div>
+
+        <div class="widget">
+          <h3>Saved searches</h3>
+          <div class="small">• Climate policy in India
+          <br>• Global supply chain resilience
+          <br>• Rural healthcare tech</div>
+        </div>
+
+      </aside>
+    </main>
+  </div>
+</body>
+</html>
